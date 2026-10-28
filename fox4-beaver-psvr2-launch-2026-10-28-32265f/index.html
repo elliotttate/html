@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
+<meta name="googlebot" content="noindex,nofollow,noarchive,nosnippet">
+<title>Fox4 / Beaver Launch Sync</title>
+<meta name="description" content="Notes from the Oct 28, 2026 Fox4 / Beaver PSVR2 launch follow-up: dates, decisions, owners and the full discussion.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ECEEF1;
+  --sheet:#F7F8F9;
+  --ink:#17202A;
+  --ink-2:#4F5B67;
+  --rule:#C5CBD2;
+  --grid:#D9DDE2;
+  --beaver:#1D5C8C;
+  --beaver-soft:#CFDFEC;
+  --beaver-ink:#164A72;
+  --fox:#E0A100;
+  --fox-soft:#F4E3B5;
+  --fox-ink:#7A5300;
+  --cal:#8A949E;
+  --cal-soft:#D7DCE1;
+  --focus:#1D5C8C;
+  --name-col:104px;
+  --days:56;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#141A20;--sheet:#1A2229;--ink:#E3E8ED;--ink-2:#9AA6B2;--rule:#34414D;--grid:#26313B;
+    --beaver:#5FA3D9;--beaver-soft:#1E3549;--beaver-ink:#8CC0EA;
+    --fox:#E8B12A;--fox-soft:#3B3015;--fox-ink:#F0C762;
+    --cal:#7D8995;--cal-soft:#28333D;--focus:#8CC0EA;color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#141A20;--sheet:#1A2229;--ink:#E3E8ED;--ink-2:#9AA6B2;--rule:#34414D;--grid:#26313B;
+  --beaver:#5FA3D9;--beaver-soft:#1E3549;--beaver-ink:#8CC0EA;
+  --fox:#E8B12A;--fox-soft:#3B3015;--fox-ink:#F0C762;
+  --cal:#7D8995;--cal-soft:#28333D;--focus:#8CC0EA;color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Archivo",ui-sans-serif,system-ui,sans-serif;
+  font-size:17px;line-height:1.55;font-stretch:100%;
+  font-variant-numeric:tabular-nums;
+}
+a{color:inherit;text-decoration-thickness:1px;text-underline-offset:3px}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:2px}
+.wrap{width:min(1120px,100% - 32px);margin-inline:auto}
+.measure{max-width:68ch}
+
+/* ---------- Header ---------- */
+.masthead{padding:56px 0 8px}
+.context{margin:0 0 28px;color:var(--ink-2);font-size:15px;max-width:68ch}
+.context strong{color:var(--ink);font-weight:650}
+h1{
+  margin:0;font-stretch:125%;font-weight:820;
+  font-size:clamp(30px,4.6vw,58px);line-height:1;letter-spacing:-.012em;
+}
+h1 .line{display:flex;align-items:baseline;gap:.32em}
+h1 .line + .line{margin-top:.08em}
+h1 .chip{flex:none;width:.5em;height:.5em;border-radius:2px;transform:translateY(-.06em)}
+.chip.beaver{background:var(--beaver)}
+.chip.fox{background:var(--fox)}
+.lede{margin:28px 0 0;font-size:20px;line-height:1.5;max-width:58ch}
+.toc{display:flex;flex-wrap:wrap;gap:6px 22px;margin:28px 0 0;padding:14px 0 0;border-top:1px solid var(--rule);font-size:15px}
+.toc a{text-decoration:none;color:var(--ink-2)}
+.toc a:hover{color:var(--ink);text-decoration:underline}
+
+/* ---------- Board ---------- */
+.board{margin:40px 0 0;padding:0}
+.board-scroll{overflow-x:auto;background:var(--sheet);border:1px solid var(--rule);border-radius:6px;-webkit-overflow-scrolling:touch}
+.board-inner{min-width:980px;position:relative;padding:14px 18px 10px}
+.row{display:grid;grid-template-columns:var(--name-col) 1fr}
+.scale .ticks{position:relative;height:30px}
+.scale .tick{position:absolute;top:0;left:calc(var(--d) / var(--days) * 100%);padding-left:6px;border-left:1px solid var(--rule);font-size:13px;font-stretch:80%;color:var(--ink-2);height:30px;line-height:22px;white-space:nowrap}
+.lane{border-top:1px solid var(--rule)}
+.lane-name{position:sticky;left:0;z-index:4;background:var(--sheet);padding:14px 10px 0 0;font-weight:750;font-size:15px;line-height:1.2;display:flex;gap:8px;align-items:flex-start}
+.lane-name small{display:block;font-weight:400;color:var(--ink-2);font-size:13px;margin-top:2px}
+.lane-name .chip{flex:none;width:11px;height:11px;border-radius:2px;margin-top:3px}
+.chip.cal{background:var(--cal)}
+.track{
+  position:relative;height:124px;
+  background-image:repeating-linear-gradient(90deg,var(--grid) 0 1px,transparent 1px calc(100% / 8));
+}
+.bar{
+  position:absolute;top:62px;height:28px;
+  left:calc(var(--s) / var(--days) * 100%);
+  width:calc((var(--e) - var(--s)) / var(--days) * 100%);
+  display:flex;align-items:center;padding:0 8px;border-radius:3px;
+  font-size:13px;font-weight:600;font-stretch:80%;white-space:nowrap;overflow:hidden;
+  transform-origin:left center;
+  animation:grow .8s cubic-bezier(.2,.75,.25,1) both;
+  animation-delay:calc(var(--s) * 14ms + 120ms);
+}
+.beaver .bar{background:var(--beaver);color:#fff}
+.beaver .bar.soft{background:var(--beaver-soft);color:var(--beaver-ink)}
+.fox .bar{background:var(--fox);color:#1F1600}
+.fox .bar.window{background:repeating-linear-gradient(135deg,var(--fox-soft) 0 7px,transparent 7px 12px);border:1px dashed var(--fox);color:var(--fox-ink)}
+.cal .bar{background:repeating-linear-gradient(135deg,var(--cal-soft) 0 7px,transparent 7px 11px);border:1px solid var(--cal);color:var(--ink)}
+.cal .bar span{background:var(--sheet);padding:1px 4px;border-radius:2px}
+.pin{
+  position:absolute;top:8px;height:54px;left:calc(var(--d) / var(--days) * 100%);
+  max-width:118px;padding-left:7px;border-left:2px solid var(--lane);
+  font-size:13px;line-height:1.22;z-index:2;
+  animation:fade .5s ease-out both;animation-delay:calc(var(--d) * 14ms + 520ms);
+}
+.pin b{display:block;font-weight:750;font-stretch:80%;font-size:13px}
+.pin.wide{max-width:170px}
+.pin.below{top:90px;height:32px;display:flex;flex-direction:column;justify-content:flex-end}
+.pin.ghost{border-left-style:dashed;color:var(--ink-2);height:82px}
+.pin.goal{height:68px}
+.pin.below.ghost{height:32px}
+.pin.goal::after{
+  content:"";position:absolute;left:-8px;bottom:-7px;width:14px;height:14px;border-radius:50%;
+  background:var(--lane);box-shadow:0 0 0 3px var(--sheet);
+}
+.beaver{--lane:var(--beaver)}
+.fox{--lane:var(--fox)}
+.cal{--lane:var(--cal)}
+.today{
+  position:absolute;top:44px;bottom:10px;width:0;
+  left:calc(18px + var(--name-col) + (100% - 36px - var(--name-col)) * 2 / var(--days));
+  border-left:2px solid var(--ink);z-index:3;pointer-events:none;
+}
+.today span{position:absolute;bottom:4px;left:5px;font-size:12px;font-weight:750;background:var(--sheet);padding:0 4px;white-space:nowrap}
+.board figcaption{margin-top:10px;font-size:14px;color:var(--ink-2);max-width:80ch}
+.scroll-hint{display:none}
+@media (max-width:1020px){.scroll-hint{display:inline}}
+@keyframes grow{from{transform:scaleX(0)}}
+@keyframes fade{from{opacity:0}}
+
+/* ---------- Sections ---------- */
+section{padding:72px 0 0}
+h2{margin:0 0 24px;font-stretch:118%;font-weight:780;font-size:clamp(26px,3.4vw,36px);line-height:1.1;letter-spacing:-.01em}
+h3{margin:0;font-size:21px;line-height:1.25;font-weight:750}
+p{margin:0 0 14px}
+
+/* Status */
+.status{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+.title{border-top:4px solid var(--lane);padding-top:18px}
+.title h3{font-stretch:118%;font-size:26px}
+.title .kind{margin:4px 0 16px;color:var(--ink-2);font-size:15px}
+.facts{margin:20px 0 0;display:grid;grid-template-columns:minmax(7.5rem,9rem) 1fr;border-top:1px solid var(--rule)}
+.facts dt,.facts dd{margin:0;padding:10px 0;border-bottom:1px solid var(--rule)}
+.facts dt{color:var(--ink-2);font-size:15px;padding-right:14px}
+.facts dd{font-size:16px}
+
+/* Agreed / open */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+.plain{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.plain li{padding:12px 0 12px 22px;border-bottom:1px solid var(--rule);position:relative}
+.plain li::before{content:"";position:absolute;left:0;top:19px;width:10px;height:10px;border-radius:2px;background:var(--lane)}
+.plain li.both::before{background:linear-gradient(90deg,var(--beaver) 50%,var(--fox) 50%)}
+.plain li.q::before{background:none;border:1.5px solid var(--lane)}
+.plain li.q.both::before{background:none;border:1.5px solid var(--ink-2)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14px;color:var(--ink-2);margin:-8px 0 22px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+
+/* Actions */
+.owners{display:grid;grid-template-columns:repeat(2,1fr);gap:36px 48px}
+.owner h3{font-size:19px;padding-bottom:8px;border-bottom:2px solid var(--ink)}
+.owner h3 small{font-weight:400;color:var(--ink-2);font-size:15px;margin-left:6px}
+.tasks{list-style:none;margin:0;padding:0}
+.tasks li{display:grid;grid-template-columns:12px 1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid var(--rule);align-items:baseline}
+.tasks li::before{content:"";width:10px;height:10px;border-radius:2px;background:var(--lane);transform:translateY(1px)}
+.tasks li.both::before{background:linear-gradient(90deg,var(--beaver) 50%,var(--fox) 50%)}
+.when{font-size:14px;font-stretch:80%;font-weight:650;color:var(--ink-2);white-space:nowrap;text-align:right}
+
+/* Discussion */
+.log{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.log li{display:grid;grid-template-columns:72px minmax(0,1fr);gap:20px;padding:18px 0;border-bottom:1px solid var(--rule)}
+.log time{font-stretch:80%;font-weight:700;font-size:15px;color:var(--ink-2);padding-top:2px}
+.log h3{font-size:18px;margin-bottom:6px}
+.log p{max-width:72ch;margin:0}
+.log p + p{margin-top:8px}
+.log q{font-style:italic}
+.who{font-weight:650}
+
+/* Next + footer */
+.next{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center;padding:26px 28px;background:var(--sheet);border:1px solid var(--rule);border-left:6px solid var(--ink);border-radius:6px}
+.next .date{font-stretch:125%;font-weight:820;font-size:clamp(28px,4vw,44px);line-height:1}
+.next .date small{display:block;font-stretch:100%;font-weight:500;font-size:15px;color:var(--ink-2);margin-top:6px}
+.next p{margin:0}
+footer{margin:72px 0 0;padding:22px 0 48px;border-top:1px solid var(--rule);color:var(--ink-2);font-size:14px}
+footer p{max-width:80ch;margin:0 0 8px}
+
+@media (max-width:860px){
+  .status,.two,.owners{grid-template-columns:1fr;gap:40px}
+}
+@media (max-width:560px){
+  body{font-size:16px}
+  .masthead{padding-top:36px}
+  .lede{font-size:18px}
+  section{padding-top:56px}
+  .log li{grid-template-columns:1fr;gap:4px}
+  .tasks li{grid-template-columns:12px 1fr}
+  .tasks .when{grid-column:2;text-align:left}
+  .facts{grid-template-columns:1fr}
+  .facts dt{border-bottom:0;padding-bottom:0}
+  .next{grid-template-columns:1fr;gap:12px}
+}
+@media (prefers-reduced-motion:reduce){
+  .bar,.pin{animation:none}
+}
+</style>
+</head>
+<body>
+
+<header class="masthead wrap">
+  <p class="context">Notes from the <strong>Fox4 / Beaver PSVR2 launch follow-up</strong>, Wednesday, October 28, 2026, 11:00 a.m. Eastern, about 30 minutes. On the call: Natasha Fahey (ran it), Magdalena Krolik, Elliott Tate, Myles Dyer, Jasmine Uniza, Todd, and Eric Masher, who joined a few minutes in.</p>
+  <h1>
+    <span class="line"><span class="chip beaver" aria-hidden="true"></span><span>Beaver holds November&nbsp;13.</span></span>
+    <span class="line"><span class="chip fox" aria-hidden="true"></span><span>Fox heads for mid&#8209;December.</span></span>
+  </h1>
+  <p class="lede">Both titles go into PlayStation FQA this Friday. Beaver keeps its November date only if it passes by Monday and gets a week of polish. Fox moves to December so it can launch with PlayStation Access.</p>
+  <nav class="toc" aria-label="On this page">
+    <a href="#board">Launch board</a>
+    <a href="#status">Where each title stands</a>
+    <a href="#agreed">Agreed and still open</a>
+    <a href="#actions">Action items</a>
+    <a href="#discussion">Full discussion</a>
+    <a href="#next">Next sync</a>
+  </nav>
+</header>
+
+<main class="wrap">
+
+<figure class="board" id="board">
+  <div class="board-scroll" tabindex="0" aria-label="Launch board, October 26 to December 20">
+    <div class="board-inner">
+      <div class="row scale" aria-hidden="true">
+        <div></div>
+        <div class="ticks">
+          <span class="tick" style="--d:0">Oct 26</span>
+          <span class="tick" style="--d:7">Nov 2</span>
+          <span class="tick" style="--d:14">Nov 9</span>
+          <span class="tick" style="--d:21">Nov 16</span>
+          <span class="tick" style="--d:28">Nov 23</span>
+          <span class="tick" style="--d:35">Nov 30</span>
+          <span class="tick" style="--d:42">Dec 7</span>
+          <span class="tick" style="--d:49">Dec 14</span>
+        </div>
+      </div>
+
+      <div class="row lane beaver">
+        <div class="lane-name"><span class="chip beaver" aria-hidden="true"></span><span>Beaver<small>Mystic Ryan</small></span></div>
+        <div class="track">
+          <span class="bar" style="--s:4;--e:8">FQA</span>
+          <span class="bar soft" style="--s:8;--e:18">Polish and rapid patches</span>
+          <span class="pin" style="--d:4"><b>Oct 30</b>Submit to FQA</span>
+          <span class="pin" style="--d:11"><b>Nov 6</b>Ryan teases it</span>
+          <span class="pin goal wide" style="--d:18"><b>Fri, Nov 13</b>Launch target, shadow drop</span>
+          <span class="pin ghost wide" style="--d:39"><b>Dec 4</b>Fallback if FQA fails</span>
+        </div>
+      </div>
+
+      <div class="row lane fox">
+        <div class="lane-name"><span class="chip fox" aria-hidden="true"></span><span>Fox4<small>PlayStation Access</small></span></div>
+        <div class="track">
+          <span class="bar" style="--s:4;--e:7">FQA</span>
+          <span class="bar window" style="--s:42;--e:54">Mid-December window</span>
+          <span class="pin" style="--d:4"><b>Oct 30</b>Resubmit to FQA</span>
+          <span class="pin wide" style="--d:43"><b>Tue, Dec 8</b>Showcase tease (may move earlier)</span>
+          <span class="pin below ghost wide" style="--d:45"><b>Thu, Dec 10</b>Possible drop</span>
+        </div>
+      </div>
+
+      <div class="row lane cal">
+        <div class="lane-name"><span class="chip cal" aria-hidden="true"></span><span>Calendar<small>Team and market</small></span></div>
+        <div class="track">
+          <span class="bar" style="--s:21;--e:26"><span>GTA week</span></span>
+          <span class="bar" style="--s:28;--e:33"><span>Thanksgiving</span></span>
+          <span class="pin wide" style="--d:7"><b>Mon, Nov 2</b>Beaver FQA ends; team sync</span>
+        </div>
+      </div>
+
+      <div class="today" aria-hidden="true"><span>Today</span></div>
+    </div>
+  </div>
+  <figcaption>The working plan as of the call. Solid bars are scheduled; dashed and hatched items are tentative, fallbacks, or weeks the team wants to avoid. <span class="scroll-hint">Scroll the board sideways to see December.</span></figcaption>
+</figure>
+
+<section id="status" aria-labelledby="status-h">
+  <h2 id="status-h">Where each title stands</h2>
+  <div class="status">
+    <article class="title beaver">
+      <h3>Beaver</h3>
+      <p class="kind">Roguelite. Launching with Mystic Ryan.</p>
+      <p>Magdalena sees Friday's build as a strong candidate to pass. The last submission failed mostly on issues the team already knew about, and Tyler is fixing everything that would definitely fail. After FQA it still needs about a week of visual polish, rapid patches and PlayStation-specific features: things certification won't block but players would notice.</p>
+      <p>Eric was firm that Beaver doesn't leave November. Magdalena, after checking with Tyler, said November 13 is achievable with polish; anything earlier is "very pushy."</p>
+      <dl class="facts">
+        <dt>FQA</dt><dd>Submit Fri, Oct 30. Testing runs through the weekend and ends Mon, Nov 2. The slot is three days; Tapir's ran up to five.</dd>
+        <dt>Target</dt><dd>Fri, Nov 13, with polish and PlayStation features in.</dd>
+        <dt>Ruled out</dt><dd>Fri, Nov 6. Ryan would have to tease it this Friday, before QA.</dd>
+        <dt>If FQA fails</dt><dd>Resubmit, adding at least a week. November is likely lost; Dec 4 was floated as the safe date, but nobody committed to December.</dd>
+        <dt>Launch partner</dt><dd>Mystic Ryan teases it on <em>Let's Talk PlayStation</em> the Friday before and shadow-drops it the next Friday.</dd>
+        <dt>Blocker</dt><dd>Ryan wants to play it before endorsing it. He has no PSVR2 test kit, and a key would make the game public.</dd>
+      </dl>
+    </article>
+
+    <article class="title fox">
+      <h3>Fox4</h3>
+      <p class="kind">FlatOut 4 VR. Launching with PlayStation Access.</p>
+      <p>FQA results came back Monday and Elliott is working through them to resubmit Friday. He's adding every earlier FQA failure to the audit, plus two requirements Sony had never stated: motion-sickness handling and snap turning. The new UI is mostly done, and he thinks it's what makes the port feel native to VR.</p>
+      <p>Jasmine wondered whether Fox might be ready first, but Magdalena and Elliott both expect Beaver to clear FQA sooner. With November off the table for Fox, the team settled on December.</p>
+      <dl class="facts">
+        <dt>FQA</dt><dd>Resubmit Fri, Oct 30. The slot isn't booked yet; Eric said to book it now.</dd>
+        <dt>Performance</dt><dd>Native 90 fps is close but would take a lot more work, so the likely target is 60 fps reprojected.</dd>
+        <dt>Target</dt><dd>Mid-December. Thu, Dec 10 is possible, pending PlayStation Access.</dd>
+        <dt>Launch partner</dt><dd>Rob Pearson teases it at the VR Games Showcase (Dec 8, possibly a week earlier), then a PlayStation Access livestream shadow-drops it with creators racing multiplayer on rigs.</dd>
+        <dt>Demand</dt><dd>Almost 7,000 PlayStation wishlists, growing by 300 to 500 a week.</dd>
+        <dt>Pricing</dt><dd>A PS Plus discount looks possible. A bundle (Elliott suggested Roboquest) and a launch discount of about 20% are still to check.</dd>
+      </dl>
+    </article>
+  </div>
+</section>
+
+<section id="agreed" aria-labelledby="agreed-h">
+  <h2 id="agreed-h">Agreed and still open</h2>
+  <div class="legend" aria-hidden="true">
+    <span><i style="background:var(--beaver)"></i>Beaver</span>
+    <span><i style="background:var(--fox)"></i>Fox4</span>
+    <span><i style="background:linear-gradient(90deg,var(--beaver) 50%,var(--fox) 50%)"></i>Both</span>
+  </div>
+  <div class="two">
+    <div>
+      <h3 style="margin-bottom:12px">What the team agreed</h3>
+      <ul class="plain">
+        <li class="both">Both titles go into PlayStation FQA on Friday, October 30.</li>
+        <li class="beaver">Beaver's working launch date is Friday, November 13. November 6 is off the table.</li>
+        <li class="fox">Fox launches in December alongside PlayStation Access, most likely mid-month. November isn't feasible for Fox.</li>
+        <li class="both">No PSVR2 release date gets announced, and no partner gets locked to a date, until the title passes FQA. Teasers can still be prepared.</li>
+        <li class="both">The team regroups Monday, November 2, once Beaver's FQA results are in.</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="margin-bottom:12px">Still open</h3>
+      <ul class="plain">
+        <li class="q beaver">What Beaver does if it fails FQA. Jasmine questioned squeezing it into a crowded December next to Fox, and Natasha doubted launching two games in the same month.</li>
+        <li class="q beaver">Whether Beaver's polish and PlayStation features will be ready for November 13. Eric is checking with Tyler.</li>
+        <li class="q beaver">How Mystic Ryan plays Beaver before the drop: a Quest or PCVR build, or a PSVR2 test kit.</li>
+        <li class="q beaver">Whether GTA coverage crowds out the November 13 episode. Jasmine noted it could help or hurt.</li>
+        <li class="q fox">The exact Fox date, which waits on PlayStation Access and on whether the VR Games Showcase moves a week earlier.</li>
+        <li class="q fox">Which Fox discount to run: PS Plus, a bundle, or a launch discount.</li>
+        <li class="q fox">Whether bHaptics works on PS5 through the PC SDK.</li>
+        <li class="q both">Elliott's idea of a "double feature," launching both together for their different audiences. It was raised but not pursued.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="actions" aria-labelledby="actions-h">
+  <h2 id="actions-h">Action items</h2>
+  <div class="owners">
+    <div class="owner">
+      <h3>Elliott Tate</h3>
+      <ul class="tasks">
+        <li class="fox"><span>Book the Fox FQA slot now and ask for Friday. If it lands on Thursday, file a ticket to move it.</span><span class="when">Now</span></li>
+        <li class="fox"><span>Finish the returned FQA fixes and fold every earlier FQA failure into the audit.</span><span class="when">Fri, Oct 30</span></li>
+        <li class="fox"><span>Keep working the motion-sickness checklist with Todd: the livery editor's smooth turn, crash camera moves, and a comfort mode that locks pitch.</span><span class="when">Ongoing</span></li>
+        <li class="fox"><span>Test bHaptics on PS5, or find someone who can.</span><span class="when">No date set</span></li>
+      </ul>
+    </div>
+    <div class="owner">
+      <h3>Magdalena Krolik</h3>
+      <ul class="tasks">
+        <li class="beaver"><span>Submit Beaver to FQA.</span><span class="when">Fri, Oct 30</span></li>
+        <li class="beaver"><span>Share the FQA results Monday, or tell Natasha early if they aren't back so the sync can move to Tuesday.</span><span class="when">Mon, Nov 2</span></li>
+      </ul>
+    </div>
+    <div class="owner">
+      <h3>Myles Dyer</h3>
+      <ul class="tasks">
+        <li class="beaver"><span>Get Mystic Ryan's answer on how he'll play Beaver, and give him a heads-up on Nov 6 and 13 without locking the date.</span><span class="when">Waiting on Ryan</span></li>
+        <li class="fox"><span>Confirm the PlayStation Access slot with Rob Pearson.</span><span class="when">End of week</span></li>
+        <li class="fox"><span>Check with Jamie whether the VR Games Showcase stays on December 8.</span><span class="when">No date set</span></li>
+        <li class="fox"><span>Follow up on the Logitech racing-rig pitch and plan early creator keys for multiplayer.</span><span class="when">Ongoing</span></li>
+        <li class="fox"><span>If bHaptics works on PS5, pitch it to PlayStation and bHaptics.</span><span class="when">After test</span></li>
+      </ul>
+    </div>
+    <div class="owner">
+      <h3>Tyler</h3>
+      <ul class="tasks">
+        <li class="beaver"><span>Fix everything that would definitely fail FQA.</span><span class="when">Fri, Oct 30</span></li>
+        <li class="beaver"><span>Spend about a week on visual polish, rapid patches and PlayStation-specific features once FQA passes.</span><span class="when">Nov 3 to 12, if it passes</span></li>
+      </ul>
+    </div>
+    <div class="owner">
+      <h3>Eric Masher</h3>
+      <ul class="tasks">
+        <li class="beaver"><span>Talk with Tyler about Beaver's polish and PlayStation features.</span><span class="when">Today</span></li>
+      </ul>
+    </div>
+    <div class="owner">
+      <h3>Natasha Fahey</h3>
+      <ul class="tasks">
+        <li class="both"><span>Book the Monday follow-up for about the same time, and move it to Tuesday if results aren't back.</span><span class="when">Mon, Nov 2</span></li>
+        <li class="fox"><span>Check PS Plus discount and bundle options for Fox.</span><span class="when">No date set</span></li>
+      </ul>
+    </div>
+    <div class="owner">
+      <h3>Todd</h3>
+      <ul class="tasks">
+        <li class="fox"><span>Help finish Fox's motion-sickness fixes so the team can move on to other projects.</span><span class="when">As soon as possible</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="discussion" aria-labelledby="discussion-h">
+  <h2 id="discussion-h">Full discussion</h2>
+  <p class="measure" style="color:var(--ink-2);margin-bottom:22px">In order, with timestamps from Elliott's Fireflies recording, which starts about three minutes before the agenda.</p>
+  <ol class="log">
+    <li>
+      <time>00:17</time>
+      <div>
+        <h3>Fox technical check-in, before the agenda</h3>
+        <p><span class="who">Elliott:</span> Fox is looking very solid. Native 90 fps is close but would take a lot more work, so the plan is probably 60 fps reprojected. Todd has been working through the motion-sickness items on the FQA list. Some smooth-turning cameras are fixed, but the livery editor still has one.</p>
+        <p>Elliott still wants a comfort mode that locks pitch and keeps the camera smoothly behind the car, because moves like the camera turning after a crash break standard VR comfort rules. The UI update is mostly done: <q>It's amazing how much the UI UX of the game relates to how much this feels like a VR native.</q> One release candidate went out this morning, and another is coming.</p>
+      </div>
+    </li>
+    <li>
+      <time>03:30</time>
+      <div>
+        <h3>Why the meeting</h3>
+        <p><span class="who">Natasha:</span> Both PlayStation launches carry big marketing efforts, so the team needs a realistic plan instead of shifting dates at the last minute.</p>
+      </div>
+    </li>
+    <li>
+      <time>04:07</time>
+      <div>
+        <h3>Beaver's best and worst case</h3>
+        <p><span class="who">Magdalena:</span> Beaver goes to FQA this Friday, and Tyler is fixing everything that would definitely fail. In the best case it passes mid-to-late next week, then needs about a week of visual polish and rapid patches for issues FQA won't block but that hurt the experience, which points to mid-November. In the worst case it fails, and another submission adds at least a week, depending on what testers find. The last fail list was simple, but testers stop partway, so new issues are possible.</p>
+      </div>
+    </li>
+    <li>
+      <time>06:24</time>
+      <div>
+        <h3>The November squeeze</h3>
+        <p><span class="who">Natasha:</span> Friday the 13th is the only workable November date, and it sounds like a scramble. The next week belongs to GTA, then comes Thanksgiving, which makes December 4 the safe plan, with development wrapping around November 20.</p>
+        <p>Elliott asked whether the team should first work out Fox's ideal date; Natasha brought in marketing before going back to development.</p>
+      </div>
+    </li>
+    <li>
+      <time>07:49</time>
+      <div>
+        <h3>Jasmine questions a December Beaver</h3>
+        <p>If Beaver can't make November, Jasmine wasn't sure it made sense to squeeze it into a December crowded with sales, while the team needs to focus on Fox.</p>
+      </div>
+    </li>
+    <li>
+      <time>08:12</time>
+      <div>
+        <h3>Eric keeps Beaver in November</h3>
+        <p><span class="who">Eric:</span> Beaver goes back into QA Friday, the team believes it will pass, then it goes to labs testing and launches. He didn't see why that rules out November. He said the testing cycle ends Monday, November 2, which Magdalena confirmed; testers work through the weekend.</p>
+        <p><q>We are not pushing this game off of November. I'm letting you know right now that is not going to happen. I'm tired of pushing deadlines.</q></p>
+      </div>
+    </li>
+    <li>
+      <time>10:08</time>
+      <div>
+        <h3>Unlock the Vault: Beaver with Mystic Ryan</h3>
+        <p><span class="who">Myles:</span> Both titles are Unlock the Vault launches with big outside names attached. Mystic Ryan has hundreds of thousands of subscribers, is one of the leading PlayStation commentators, likes roguelites and champions PSVR2. He'll shadow-drop Beaver on a Friday episode of <em>Let's Talk PlayStation</em> after teasing it the Friday before. Having a channel that big gives the team freedom over which Friday it picks.</p>
+        <p>The catch, which applies to Fox too: the team doesn't announce PSVR2 dates until QA passes, after having to walk dates back with the community before. Myles won't ask Ryan to prepare an episode for a date that might move. If FQA clears on November 2, Ryan can tease on November 6 and drop on November 13.</p>
+        <p>Ryan wants to play the game before endorsing it. He has no PSVR2 test kit, and generating a key would make the game public. Myles offered two options, playing on a Quest or on PCVR with a PSVR2 headset, or getting him a test kit, and is waiting to hear back.</p>
+      </div>
+    </li>
+    <li>
+      <time>13:42</time>
+      <div>
+        <h3>If Beaver fails</h3>
+        <p><span class="who">Natasha:</span> The best case leaves enough time for polish, and Magdalena agreed. If Beaver fails, the team will know Monday, file for another QA slot, and probably miss November or need a different launch strategy.</p>
+        <p>Jasmine wanted Fox's timeline before any final call, and pointed out that Ryan will probably also be covering GTA on the 13th.</p>
+      </div>
+    </li>
+    <li>
+      <time>14:51</time>
+      <div>
+        <h3>Fox's resubmission</h3>
+        <p><span class="who">Elliott:</span> Results came back Monday, and the team is working through the list to resubmit Friday. No slot is booked; booking a day ahead has always worked so far. Eric said to book it now and ask for Friday. Tyler once got an earlier date than he wanted and had it moved a day with a ticket.</p>
+      </div>
+    </li>
+    <li>
+      <time>16:11</time>
+      <div>
+        <h3>Is the next Fox build the launch build?</h3>
+        <p><span class="who">Elliott:</span> The team now understands much better what passes FQA, and he'll pull every earlier failure into the audit. Some requirements were never stated, such as motion-sickness handling and snap turning. He'd let gameplay stay a bit buggier while getting the game state right, but it turns out FQA fails buggy gameplay too, which he sees as polish. He rates the chance of passing as high, though testers stopped partway last time.</p>
+      </div>
+    </li>
+    <li>
+      <time>17:22</time>
+      <div>
+        <h3>Which one passes first</h3>
+        <p>Jasmine thought Fox might be ready sooner. Elliott thought Beaver was further along, and Magdalena agreed: Beaver is in a healthier state and should pass first. Slots now look like three days, so results should be back by Monday.</p>
+        <p>Jasmine concluded only one title fits in November, with the other in December. Elliott floated a "double feature," since the two games have very different audiences and genres.</p>
+      </div>
+    </li>
+    <li>
+      <time>18:58</time>
+      <div>
+        <h3>Unlock the Vault: Fox with PlayStation Access</h3>
+        <p><span class="who">Myles:</span> PlayStation Access, PlayStation's official community YouTube channel, which gave Trombone Champ strong exposure, would shadow-drop Fox. Rob Pearson would tease it at the VR Games Showcase on December 8, which Myles has heard may move a week earlier and will check with Jamie. A PlayStation Access livestream would then announce that FlatOut 4 VR is out on PSVR2 and race it in multiplayer on driving rigs.</p>
+        <p>Myles has sent Logitech a deck proposing full racing gear for the PlayStation Access offices. Because the store page is live, keys can go to creators early, so they can race against PlayStation Access before it opens to everyone. That probably means mid-December, but he thinks PlayStation's backing will cut through the December noise. Jasmine noted December is a hard time to launch a game.</p>
+      </div>
+    </li>
+    <li>
+      <time>21:05</time>
+      <div>
+        <h3>Why a shadow drop</h3>
+        <p>Elliott asked whether a shadow drop is the only option, since it gives up a ramp-up. Natasha said the announced store page has been building wishlists, now almost 7,000, growing 300 to 500 a week.</p>
+        <p><span class="who">Myles:</span> PlayStation Access could instead play it and give a date, or the showcase could announce a date and a livestream. He prefers the shadow drop: it's more powerful and could bring a PlayStation blog post, since the pitch is about what the team brings to PlayStation, not a favor. After the Steam 1.0 launch, the PSVR2 conversation is huge and people expect it before year-end, so a "nudge, nudge, wink, wink" campaign would let fans guess what's in the vault.</p>
+      </div>
+    </li>
+    <li>
+      <time>22:36</time>
+      <div>
+        <h3>Fox's date isn't confirmed</h3>
+        <p>Natasha asked about the showcase tease and the PlayStation Access podcast on Thursday. Myles is still waiting on Rob, whose office has been dealing with illness and Halloween, and expects an answer by the end of the week. Partners this big set the slot themselves. He told Rob mid-December looks likely because November isn't feasible, and Natasha said the game will definitely be ready by then.</p>
+      </div>
+    </li>
+    <li>
+      <time>23:31</time>
+      <div>
+        <h3>Launching at full price in December</h3>
+        <p><span class="who">Eric:</span> <q>I would normally never launch a game in December because it'll be full price when everything else is on sale.</q> Fox is the exception: the game is strong, demand is there, and the 1.0 coverage has it amped up.</p>
+        <p>On discounts, Eric said a launch discount isn't normally possible on PlayStation. Myles thought a PS Plus discount would work, and since Fox is multiplayer, most buyers would likely have PS Plus anyway. Natasha will look into a discounted bundle, Elliott suggested one with Roboquest, and Eric thought even 20% off at launch would be good.</p>
+      </div>
+    </li>
+    <li>
+      <time>24:59</time>
+      <div>
+        <h3>Early December beats late December</h3>
+        <p>Jasmine said mid-December is the latest, and earlier is better to avoid the Christmas crowd. Myles noted the showcase is Tuesday the 8th and Thursday the 10th could work, but he won't let PlayStation Access lock a day until Fox is definitely ready. Teaser work can start in the meantime. Originally the teaser was going to be a showcase video on their channel, but Jamie would probably like Rob at the showcase itself.</p>
+      </div>
+    </li>
+    <li>
+      <time>25:50</time>
+      <div>
+        <h3>Fox is settled; back to Beaver</h3>
+        <p>Jasmine called Fox mostly squared away for December and asked Elliott and Todd to finish as soon as they can so they can move to other projects. Then she asked whether Beaver can make November 13, close as it is to GTA's PlayStation launch. Eric stepped out to talk with Tyler: FQA isn't his worry, polish and PlayStation features are.</p>
+      </div>
+    </li>
+    <li>
+      <time>26:51</time>
+      <div>
+        <h3>November 13 it is, if FQA passes</h3>
+        <p><span class="who">Magdalena:</span> From her talk with Tyler, the 13th works with polish and all the PlayStation-specific features; anything earlier is very pushy. Natasha added that November 6 would mean Ryan teasing it this Friday, ahead of QA.</p>
+        <p>After a quick mix-up over which title was under discussion, Natasha questioned launching two games in the same month. Magdalena said that even if FQA comes back midweek, the team would still push for the 13th. Natasha summed up: the 13th is the best case, and the 6th is nearly impossible.</p>
+      </div>
+    </li>
+    <li>
+      <time>28:36</time>
+      <div>
+        <h3>Results by Monday</h3>
+        <p>Magdalena expects Beaver's results Monday. Slots seem shorter now: Tapir's ran up to five days, and this one is three.</p>
+      </div>
+    </li>
+    <li>
+      <time>29:00</time>
+      <div>
+        <h3>bHaptics on PlayStation</h3>
+        <p>Myles asked whether Fox will support bHaptics at launch on PlayStation. Elliott hasn't done bHaptics on PlayStation but assumes the PC SDK will work; someone needs to test it. If it works, Myles will pitch it to PlayStation and see whether bHaptics can supply suits.</p>
+      </div>
+    </li>
+    <li>
+      <time>29:35</time>
+      <div>
+        <h3>Next sync</h3>
+        <p>Jasmine suggested a 15-minute sync on Monday. Natasha will book it for about the same time and move it to Tuesday if results aren't in. Magdalena will let her know, and said testers still working on Monday would be a good sign.</p>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<section id="next" aria-labelledby="next-h">
+  <h2 id="next-h" class="visually-hidden" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Next sync</h2>
+  <div class="next">
+    <div class="date">Mon, Nov&nbsp;2<small>About 11:00 a.m. Eastern, 15 minutes. Tuesday if results are late.</small></div>
+    <p>Beaver's FQA verdict decides whether November 13 holds. Also pending: Fox's FQA slot, Mystic Ryan's answer on access, and PlayStation Access's date.</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <p>Compiled from Fireflies recordings of the call. Automatic transcripts mishear names, so "Viva" is read as Beaver and "Taylor" as Tyler. Personal remarks are left out.</p>
+  <p>Source: <a href="https://app.fireflies.ai/view/01M61GDETGCA6FG6ES8WG37AV8">Elliott's Fireflies recording</a>, visible to call participants only.</p>
+</footer>
+
+</body>
+</html>
